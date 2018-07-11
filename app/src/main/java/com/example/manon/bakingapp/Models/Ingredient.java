@@ -1,6 +1,9 @@
 package com.example.manon.bakingapp.Models;
 
-public class Ingredient {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Ingredient implements Parcelable {
     private double quantity;
     private String measure;
     private String ingredient;
@@ -35,4 +38,38 @@ public class Ingredient {
         str.append(ingredient).append(" / ").append(Double.toString(quantity)).append(" / ").append(measure).append(".\n");
         return str.toString();
     }
+
+    // Parcelable
+    public Ingredient(Parcel in){
+        this.quantity = in.readDouble();
+        this.measure = in.readString();
+        this.ingredient = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(quantity);
+        dest.writeString(measure);
+        dest.writeString(ingredient);
+    }
+
+    public static final Parcelable.Creator<Ingredient> CREATOR = new Parcelable.Creator<Ingredient>(){
+
+        @Override
+        public Ingredient createFromParcel(Parcel source) {
+            return new Ingredient(source);
+        }
+
+        @Override
+        public Ingredient[] newArray(int size) {
+            return new Ingredient[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+
 }
