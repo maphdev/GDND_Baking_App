@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements CardAdapter.ListI
         Recipe recipe = cardAdapter.getListRecipes().get(clickedPosition);
 
         Context context = MainActivity.this;
-        Class destinationClass = RecipeActivity.class;
+        Class destinationClass = RecipeDetailsActivity.class;
 
         Intent startRecipeActivity = new Intent(context, destinationClass);
         startRecipeActivity.putExtra("recipe", recipe);

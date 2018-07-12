@@ -3,4 +3,7 @@
     <string name="app_name">Baking App</string>
     <!-- Resources -->
     <string name="json_filename">baking.json</string>
+    <!-- Adapter -->
+    <string name="list_ingredients">List of ingredients</string>
+    <string name="step">step </string>
 </resources>
