@@ -32,6 +32,14 @@ public class Ingredient implements Parcelable {
         this.ingredient = ingredient;
     }
 
+    public String getMeasure(){
+        return measure;
+    }
+
+    public void setMeasure(String measure){
+        this.measure = measure;
+    }
+
     // toString
     public String toString(){
         StringBuilder str = new StringBuilder();
