@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements CardAdapter.ListI
         Class destinationClass = RecipeDetailsActivity.class;
 
         Intent startRecipeActivity = new Intent(context, destinationClass);
-        startRecipeActivity.putExtra("recipe", recipe);
+        startRecipeActivity.putExtra(getString(R.string.PARCELABLE_RECIPE), recipe);
         startActivity(startRecipeActivity);
     }
 }

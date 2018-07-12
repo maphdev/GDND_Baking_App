@@ -47,9 +47,9 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         String urlImage = listRecipes.get(position).getImage();
         if (urlImage.isEmpty() || urlImage == null){
-            holder.cardImgView.setImageResource(R.color.colorAccent);
+            holder.cardImgView.setImageResource(R.color.colorBlackish);
         } else {
-            Picasso.with(this.context).load(urlImage).placeholder(R.color.colorAccent).error(R.color.colorAccent).into(holder.cardImgView);
+            Picasso.with(this.context).load(urlImage).placeholder(R.color.colorBlackish).error(R.color.colorBlackish).into(holder.cardImgView);
         }
         holder.cardTxtView.setText(listRecipes.get(position).getName());
     }

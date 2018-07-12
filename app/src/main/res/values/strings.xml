@@ -6,4 +6,10 @@
     <!-- Adapter -->
     <string name="list_ingredients">List of ingredients</string>
     <string name="step">step </string>
+    <!-- variables -->
+    <string name="PARCELABLE_RECIPE">parcelable_recipe</string>
+    <string name="error_view_type">"Invalid view type, value of "</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
