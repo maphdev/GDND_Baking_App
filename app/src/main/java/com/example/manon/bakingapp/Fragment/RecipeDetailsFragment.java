@@ -54,7 +54,6 @@ public class RecipeDetailsFragment extends Fragment  implements RecipeDetailsAda
 
     @Override
     public void onListItemClicked(int clickedItemIndex, Recipe recipe) {
-        Log.v("TRYHARD", "yes");
         Context context = getContext();
         if(clickedItemIndex == 0){
             Class destinationClass = ListIngredientsActivity.class;
@@ -64,7 +63,7 @@ public class RecipeDetailsFragment extends Fragment  implements RecipeDetailsAda
         } else {
             Class destinationClass = StepActivity.class;
             Intent startStepActivity = new Intent(context, destinationClass);
-            startStepActivity.putExtra(getString(R.string.PARCELABLE_RECIPE), recipe);
+            startStepActivity.putExtra(getString(R.string.PARCELABLE_STEP), recipe.getSteps().get(clickedItemIndex-1));
             startActivity(startStepActivity);
         }
     }

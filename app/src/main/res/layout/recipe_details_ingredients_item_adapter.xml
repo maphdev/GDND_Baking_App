@@ -9,7 +9,8 @@
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
     app:cardElevation="1dp"
-    app:cardCornerRadius="2dp">
+    app:cardCornerRadius="2dp"
+    app:cardBackgroundColor="@color/colorAccent">
 
     <TextView
         android:id="@+id/ingredients_txtView"

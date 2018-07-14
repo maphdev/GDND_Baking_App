@@ -8,6 +8,7 @@
     <string name="step">step </string>
     <!-- variables -->
     <string name="PARCELABLE_RECIPE">parcelable_recipe</string>
+    <string name="PARCELABLE_STEP">parcelable_step</string>
     <string name="error_view_type">"Invalid view type, value of "</string>
 
     <!-- TODO: Remove or change this placeholder text -->
