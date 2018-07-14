@@ -35,6 +35,10 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         return listRecipes;
     }
 
+    public void setListRecipes(List<Recipe> listRecipes){
+        this.listRecipes = listRecipes;
+    }
+
     @NonNull
     @Override
     public CardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -47,7 +51,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         String urlImage = listRecipes.get(position).getImage();
         if (urlImage.isEmpty() || urlImage == null){
-            holder.cardImgView.setImageResource(R.color.colorBlackish);
+            holder.cardImgView.setImageResource(R.drawable.question_marks);
         } else {
             Picasso.with(this.context).load(urlImage).placeholder(R.color.colorBlackish).error(R.color.colorBlackish).into(holder.cardImgView);
         }

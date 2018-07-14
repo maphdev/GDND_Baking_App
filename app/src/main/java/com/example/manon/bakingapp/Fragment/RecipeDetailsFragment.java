@@ -63,7 +63,8 @@ public class RecipeDetailsFragment extends Fragment  implements RecipeDetailsAda
         } else {
             Class destinationClass = StepActivity.class;
             Intent startStepActivity = new Intent(context, destinationClass);
-            startStepActivity.putExtra(getString(R.string.PARCELABLE_STEP), recipe.getSteps().get(clickedItemIndex-1));
+            startStepActivity.putExtra(getString(R.string.PARCELABLE_STEP), recipe.getSteps().get(clickedItemIndex - 1));
+            startStepActivity.putExtra(getString(R.string.PARCELABLE_RECIPE), recipe);
             startActivity(startStepActivity);
         }
     }
