@@ -54,6 +54,7 @@ public class StepDetailsFragment extends Fragment {
     private Step step;
     private int id;
     private boolean navigationButtons = true;
+    private long positionExoPlayer = 0;
 
     // Required empty public constructor
     public StepDetailsFragment() {}
@@ -81,6 +82,12 @@ public class StepDetailsFragment extends Fragment {
         id = getArguments().getInt("ID");
         step = recipe.getSteps().get(id);
         navigationButtons = getArguments().getBoolean("NAVIGATION_BUTTONS");
+
+        if (savedInstanceState != null){
+            if (savedInstanceState.containsKey("POSITION_EXOPLAYER")){
+                positionExoPlayer = savedInstanceState.getLong("POSITION_EXOPLAYER");
+            }
+        }
 
         populateViews(step);
 
@@ -124,6 +131,7 @@ public class StepDetailsFragment extends Fragment {
             String userAgent = Util.getUserAgent(getContext(), getResources().getString(R.string.name_exoplayer));
             MediaSource mediaSource = new ExtractorMediaSource(uri, new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             exoPlayer.prepare(mediaSource);
+            exoPlayer.seekTo(positionExoPlayer);
             exoPlayer.setPlayWhenReady(true);
         }
     }
@@ -208,5 +216,11 @@ public class StepDetailsFragment extends Fragment {
         super.onDestroyView();
         if (exoPlayer != null)
             releasePlayer();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("POSITION_EXOPLAYER", exoPlayer.getCurrentPosition());
     }
 }

@@ -20,7 +20,7 @@ import com.example.manon.bakingapp.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class RecipeDetailsActivity extends AppCompatActivity implements RecipeDetailsFragment.OnAdapterClickListener{
+public class RecipeDetailsActivity extends AppCompatActivity implements RecipeDetailsFragment.OnAdapterClickListener, StepDetailsFragment.ChangeFragment{
 
     private boolean twoPane = true;
     private FragmentManager fragmentManager = getSupportFragmentManager();
@@ -82,5 +82,16 @@ public class RecipeDetailsActivity extends AppCompatActivity implements RecipeDe
                 startActivity(startStepActivity);
             }
         }
+    }
+
+    @Override
+    public void increaseStep(Recipe recipe, int id, boolean navigationButton) {
+        StepDetailsFragment stepDetailsFragment = StepDetailsFragment.newInstance(recipe, id+1, navigationButton);
+        return;
+    }
+
+    @Override
+    public void decreaseStep(Recipe recipe, int id, boolean navigationButton) {
+        return;
     }
 }
