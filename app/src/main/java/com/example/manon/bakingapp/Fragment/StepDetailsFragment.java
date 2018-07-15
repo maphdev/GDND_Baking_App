@@ -1,13 +1,18 @@
 package com.example.manon.bakingapp.Fragment;
 
+import android.content.Context;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,13 +50,24 @@ public class StepDetailsFragment extends Fragment {
     @BindView(R.id.buttonLeft) Button buttonLeft;
 
     private SimpleExoPlayer exoPlayer;
-    Recipe recipe;
-    Step step;
+    private Recipe recipe;
+    private Step step;
+    private int id;
+    private boolean navigationButtons = true;
 
-    public StepDetailsFragment() {
-        // Required empty public constructor
+    // Required empty public constructor
+    public StepDetailsFragment() {}
+
+    // create a fragment with a recipe
+    public static StepDetailsFragment newInstance(Recipe recipe, int id, boolean navigationButtons){
+        StepDetailsFragment stepDetailsFragment = new StepDetailsFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("RECIPE", recipe);
+        args.putInt("ID", id);
+        args.putBoolean("NAVIGATION_BUTTONS", navigationButtons);
+        stepDetailsFragment.setArguments(args);
+        return stepDetailsFragment;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,11 +77,12 @@ public class StepDetailsFragment extends Fragment {
 
         ButterKnife.bind(this, rootView);
 
-        recipe = getActivity().getIntent().getParcelableExtra(getString(R.string.PARCELABLE_RECIPE));
-        step = getActivity().getIntent().getParcelableExtra(getString(R.string.PARCELABLE_STEP));
+        recipe = getArguments().getParcelable("RECIPE");
+        id = getArguments().getInt("ID");
+        step = recipe.getSteps().get(id);
+        navigationButtons = getArguments().getBoolean("NAVIGATION_BUTTONS");
 
         populateViews(step);
-        setButtons();
 
         return rootView;
     }
@@ -84,7 +101,6 @@ public class StepDetailsFragment extends Fragment {
         String urlThumbnailString = step.getThumbnailURL();
         if(!urlThumbnailString.equals("") & NetworkUtils.isNetworkAvailable(getContext())){
             if (NetworkUtils.isAnImage(urlThumbnailString)){
-                //Toast.makeText(getContext(), "Yes is image", Toast.LENGTH_SHORT).show();
                 playerView.setDefaultArtwork(NetworkUtils.getBitmapFromURL(step.getThumbnailURL()));
             }
         }
@@ -113,21 +129,21 @@ public class StepDetailsFragment extends Fragment {
     }
 
     // release exoplayer
-    private void releasePlayer(){
-        exoPlayer.stop();
-        exoPlayer.release();
-        exoPlayer = null;
+    public void releasePlayer(){
+        if (exoPlayer != null) {
+            exoPlayer.stop();
+            exoPlayer.release();
+            exoPlayer = null;
+        }
     }
 
-    // what happens when the activity is destroyed?
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (exoPlayer != null)
-            releasePlayer();
-    }
-
+    // set and display the buttons
     public void setButtons(){
+        if(!navigationButtons){
+            buttonRight.setVisibility(View.INVISIBLE);
+            buttonLeft.setVisibility(View.INVISIBLE);
+            return;
+        }
         if(step.getId()+1 >= recipe.getSteps().size()){
             buttonRight.setVisibility(View.INVISIBLE);
         } else if(step.getId()-1 < 0){
@@ -139,22 +155,58 @@ public class StepDetailsFragment extends Fragment {
         buttonRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                step = recipe.getSteps().get(step.getId()+1);
-                if (exoPlayer != null){
-                    releasePlayer();
-                }
-                populateViews(step);
+                changeFragment.increaseStep(recipe, id, navigationButtons);
             }
         });
         buttonLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                step = recipe.getSteps().get(step.getId()-1);
-                if (exoPlayer != null){
-                    releasePlayer();
-                }
-                populateViews(step);
+                changeFragment.decreaseStep(recipe, id, navigationButtons);
             }
         });
+    }
+
+    // change fragments with button's action, implemented by activity
+    ChangeFragment changeFragment;
+
+    public interface ChangeFragment{
+        void increaseStep(Recipe recipe, int id, boolean navigationButton);
+        void decreaseStep(Recipe recipe, int id, boolean navigationButton);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            changeFragment = (ChangeFragment) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement ChangeFragment");
+
+        }
+    }
+
+    // when a phone is a landscape mode, the exoplayer is in full screen
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            SimpleExoPlayerView.LayoutParams params = (SimpleExoPlayerView.LayoutParams) playerView.getLayoutParams();
+            params.width = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
+            params.height = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
+            playerView.setLayoutParams(params);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            SimpleExoPlayerView.LayoutParams params = (SimpleExoPlayerView.LayoutParams) playerView.getLayoutParams();
+            params.width = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
+            params.height = 300;
+            playerView.setLayoutParams(params);
+        }
+    }
+
+    // what happens when the activity is destroyed?
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (exoPlayer != null)
+            releasePlayer();
     }
 }

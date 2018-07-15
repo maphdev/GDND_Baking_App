@@ -2,6 +2,7 @@ package com.example.manon.bakingapp.Fragment;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,10 +25,17 @@ public class ListIngredientsFragment extends Fragment {
 
     @BindView(R.id.list_ingredients_recyclerview) RecyclerView recyclerView;
 
-    public ListIngredientsFragment() {
-        // Required empty public constructor
-    }
+    // Required empty public constructor
+    public ListIngredientsFragment() {}
 
+    // create a fragment with a recipe
+    public static ListIngredientsFragment newInstance(Recipe recipe){
+        ListIngredientsFragment listIngredientsFragment = new ListIngredientsFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("RECIPE", recipe);
+        listIngredientsFragment.setArguments(args);
+        return listIngredientsFragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,7 +46,7 @@ public class ListIngredientsFragment extends Fragment {
 
         ButterKnife.bind(this, rootView);
 
-        Recipe recipe = getActivity().getIntent().getParcelableExtra(getString(R.string.PARCELABLE_RECIPE));
+        Recipe recipe = getArguments().getParcelable("RECIPE");
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(linearLayoutManager.VERTICAL);

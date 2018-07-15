@@ -7,14 +7,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.example.manon.bakingapp.Activity.ListIngredientsActivity;
-import com.example.manon.bakingapp.Activity.StepActivity;
 import com.example.manon.bakingapp.Adapter.RecipeDetailsAdapter;
 import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
@@ -26,10 +22,17 @@ public class RecipeDetailsFragment extends Fragment  implements RecipeDetailsAda
 
     @BindView(R.id.master_list_recycler) RecyclerView recyclerView;
 
-    public RecipeDetailsFragment() {
-        // Required empty public constructor
-    }
+    // Required empty public constructor
+    public RecipeDetailsFragment() {}
 
+    // create a fragment with a recipe
+    public static RecipeDetailsFragment newInstance(Recipe recipe){
+        RecipeDetailsFragment recipeDetailsFragment = new RecipeDetailsFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("RECIPE", recipe);
+        recipeDetailsFragment.setArguments(args);
+        return recipeDetailsFragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,12 +41,13 @@ public class RecipeDetailsFragment extends Fragment  implements RecipeDetailsAda
 
         ButterKnife.bind(this, rootView);
 
-        Recipe recipe = getActivity().getIntent().getParcelableExtra(getString(R.string.PARCELABLE_RECIPE));
+        Recipe recipe = getArguments().getParcelable("RECIPE");
+        getActivity().setTitle(recipe.getName());
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setOrientation(linearLayoutManager.VERTICAL);
 
-        RecipeDetailsAdapter recipeDetailsAdapter = new RecipeDetailsAdapter(recipe, this);
+        RecipeDetailsAdapter recipeDetailsAdapter = new RecipeDetailsAdapter(recipe, this, getContext());
 
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(recipeDetailsAdapter);
@@ -54,18 +58,23 @@ public class RecipeDetailsFragment extends Fragment  implements RecipeDetailsAda
 
     @Override
     public void onListItemClicked(int clickedItemIndex, Recipe recipe) {
-        Context context = getContext();
-        if(clickedItemIndex == 0){
-            Class destinationClass = ListIngredientsActivity.class;
-            Intent startListIngredientsActivity = new Intent(context, destinationClass);
-            startListIngredientsActivity.putExtra(getString(R.string.PARCELABLE_RECIPE), recipe);
-            startActivity(startListIngredientsActivity);
-        } else {
-            Class destinationClass = StepActivity.class;
-            Intent startStepActivity = new Intent(context, destinationClass);
-            startStepActivity.putExtra(getString(R.string.PARCELABLE_STEP), recipe.getSteps().get(clickedItemIndex - 1));
-            startStepActivity.putExtra(getString(R.string.PARCELABLE_RECIPE), recipe);
-            startActivity(startStepActivity);
+        callbacks.onAdapterClickListener(clickedItemIndex, recipe);
+    }
+
+    // communication with the activity !
+    OnAdapterClickListener callbacks;
+
+    public interface OnAdapterClickListener{
+        void onAdapterClickListener(int clickedItemIndex, Recipe recipe);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            callbacks = (OnAdapterClickListener) context;
+        } catch (ClassCastException e){
+            throw new ClassCastException(context.toString() + " must implement OnAdapterClickListener");
         }
     }
 }
