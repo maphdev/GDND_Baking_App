@@ -3,10 +3,12 @@ package com.example.manon.bakingapp.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import com.example.manon.bakingapp.Fragment.RecipeDetailsFragment;
 import com.example.manon.bakingapp.Fragment.StepDetailsFragment;
 import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
+import com.example.manon.bakingapp.Widget.FetchDataRecipeService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -51,6 +54,15 @@ public class RecipeDetailsActivity extends AppCompatActivity implements RecipeDe
             if(findViewById(R.id.sw600_separator) != null){
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             }
+
+            SharedPreferences sharedPreferences = getSharedPreferences(getResources().getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt(getResources().getString(R.string.preference_recipe_id), recipe.getId()-1);
+            editor.apply();
+            FetchDataRecipeService.startActionFetchDataRecipe(getApplicationContext());
+            Log.i("MSG", "id : " + Integer.toString(recipe.getId()));
+            Log.i("MSG", Integer.toString(sharedPreferences.getInt(getResources().getString(R.string.preference_recipe_id), 0)));
+
         }
     }
 

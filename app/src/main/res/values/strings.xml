@@ -13,4 +13,6 @@
     <string name="name_exoplayer">VideoStep</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="shared_preferences">shared_preferences</string>
+    <string name="preference_recipe_id">pref_recipe_id</string>
 </resources>

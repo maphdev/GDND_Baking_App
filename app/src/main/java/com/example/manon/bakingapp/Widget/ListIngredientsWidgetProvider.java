@@ -1,10 +1,12 @@
 package com.example.manon.bakingapp.Widget;
 
+import android.app.IntentService;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -26,14 +28,24 @@ public class ListIngredientsWidgetProvider extends AppWidgetProvider {
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.list_ingredients_widget);
 
-        Log.i("WIDGET", recipe.getName());
+        Intent intent;
+        if (recipe == null){
+            intent = new Intent(context, MainActivity.class);
+        } else {
+            intent = new Intent(context, RecipeDetailsActivity.class);
+            intent.setAction(Long.toString(System.currentTimeMillis()));
+            intent.putExtra(context.getResources().getString(R.string.PARCELABLE_RECIPE), recipe);
+        }
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.widget_imgView, pendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        FetchDataRecipeService.startActionFetchDataRecipe(context, 0);
+        FetchDataRecipeService.startActionFetchDataRecipe(context);
     }
 
     public static void updateRecipeWidgets(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds, Recipe recipe){
