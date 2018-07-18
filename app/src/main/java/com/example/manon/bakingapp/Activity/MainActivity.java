@@ -1,5 +1,7 @@
 package com.example.manon.bakingapp.Activity;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +22,7 @@ import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
 import com.example.manon.bakingapp.Utils.JsonUtils;
 import com.example.manon.bakingapp.Utils.NetworkUtils;
+import com.example.manon.bakingapp.Widget.ListIngredientsWidgetProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +47,9 @@ public class MainActivity extends AppCompatActivity implements CardAdapter.ListI
 
         SharedPreferences sharedPreferences = getSharedPreferences(getResources().getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(getResources().getString(R.string.preference_recipe_id), 0);
+        editor.putInt(getResources().getString(R.string.preference_recipe_id), -1);
         editor.apply();
-        Log.i("MSG", Integer.toString(sharedPreferences.getInt(getResources().getString(R.string.preference_recipe_id), 0)));
+        sendBroadcast();
     }
 
     // set the adapter
@@ -125,5 +128,11 @@ public class MainActivity extends AppCompatActivity implements CardAdapter.ListI
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void sendBroadcast(){
+        Intent intent = new Intent(this, ListIngredientsWidgetProvider.class);
+        intent.setAction(ListIngredientsWidgetProvider.WIDGET_UPDATE);
+        sendBroadcast(intent);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.manon.bakingapp.Activity;
 
 import android.app.Application;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +21,7 @@ import com.example.manon.bakingapp.Fragment.StepDetailsFragment;
 import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
 import com.example.manon.bakingapp.Widget.FetchDataRecipeService;
+import com.example.manon.bakingapp.Widget.ListIngredientsWidgetProvider;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,12 +60,11 @@ public class RecipeDetailsActivity extends AppCompatActivity implements RecipeDe
 
             SharedPreferences sharedPreferences = getSharedPreferences(getResources().getString(R.string.shared_preferences), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putInt(getResources().getString(R.string.preference_recipe_id), recipe.getId()-1);
+            editor.putInt(getResources().getString(R.string.preference_recipe_id), recipe.getId());
+            editor.putString(getResources().getString(R.string.preference_recipe_name), recipe.getName());
             editor.apply();
-            FetchDataRecipeService.startActionFetchDataRecipe(getApplicationContext());
-            Log.i("MSG", "id : " + Integer.toString(recipe.getId()));
-            Log.i("MSG", Integer.toString(sharedPreferences.getInt(getResources().getString(R.string.preference_recipe_id), 0)));
 
+            sendBroadcast();
         }
     }
 
@@ -104,6 +106,13 @@ public class RecipeDetailsActivity extends AppCompatActivity implements RecipeDe
 
     @Override
     public void decreaseStep(Recipe recipe, int id, boolean navigationButton) {
+        StepDetailsFragment stepDetailsFragment = StepDetailsFragment.newInstance(recipe, id-1, navigationButton);
         return;
+    }
+
+    public void sendBroadcast(){
+        Intent intent = new Intent(this, ListIngredientsWidgetProvider.class);
+        intent.setAction(ListIngredientsWidgetProvider.WIDGET_UPDATE);
+        sendBroadcast(intent);
     }
 }

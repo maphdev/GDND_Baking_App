@@ -16,7 +16,6 @@ import com.example.manon.bakingapp.Utils.NetworkUtils;
 public class FetchDataRecipeService extends IntentService{
 
     public static final String ACTION_FETCH_RECIPE = "com.example.manon.bakingapp.action.fetch_recipe";
-    public static final String EXTRA_RECIPE_ID = "com.example.manon.bakingapp.extra.RECIPE_ID";
 
     public FetchDataRecipeService() {
         super("FetchDataRecipeService");
@@ -52,6 +51,9 @@ public class FetchDataRecipeService extends IntentService{
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, ListIngredientsWidgetProvider.class));
 
-        ListIngredientsWidgetProvider.updateRecipeWidgets(this, appWidgetManager, appWidgetIds, recipe);
+
+        //ListIngredientsWidgetProvider.updateRecipeWidgets(this, appWidgetManager, appWidgetIds);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_gridview);
+
     }
 }

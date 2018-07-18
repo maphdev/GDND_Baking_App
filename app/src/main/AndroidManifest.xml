@@ -34,6 +34,8 @@
         </receiver>
 
         <service android:name=".Widget.FetchDataRecipeService"/>
+        <service android:name=".Widget.GridWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 
 </manifest>

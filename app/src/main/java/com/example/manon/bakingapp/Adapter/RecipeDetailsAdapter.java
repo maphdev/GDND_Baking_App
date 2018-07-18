@@ -4,11 +4,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.manon.bakingapp.Models.Recipe;
@@ -47,11 +45,11 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         switch (viewType){
             case VIEW_TYPE_INGREDIENTS:
-                layoutId = R.layout.recipe_details_ingredients_item_adapter;
+                layoutId = R.layout.item_adapter_recipe_details_ingredients;
                 View view = inflater.inflate(layoutId, parent, false);
                 return new RecipeDetailsIngredientsViewHolder(view);
             case VIEW_TYPE_STEP:
-                layoutId = R.layout.recipe_details_step_item_adapter;
+                layoutId = R.layout.item_adapter_recipe_details_step;
                 View view2 = inflater.inflate(layoutId, parent, false);
                 return new RecipeDetailsStepViewHolder(view2);
             default:
