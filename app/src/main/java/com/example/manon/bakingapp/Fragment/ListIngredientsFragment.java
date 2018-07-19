@@ -2,7 +2,6 @@ package com.example.manon.bakingapp.Fragment;
 
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.manon.bakingapp.Adapter.IngredientsAdapter;
-import com.example.manon.bakingapp.Adapter.RecipeDetailsAdapter;
 import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
 

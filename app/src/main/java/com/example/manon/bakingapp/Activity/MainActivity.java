@@ -1,7 +1,5 @@
 package com.example.manon.bakingapp.Activity;
 
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +17,6 @@ import android.widget.Toast;
 import com.example.manon.bakingapp.Adapter.CardAdapter;
 import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
-import com.example.manon.bakingapp.Utils.JsonUtils;
 import com.example.manon.bakingapp.Utils.NetworkUtils;
 import com.example.manon.bakingapp.Widget.ListIngredientsWidgetProvider;
 
@@ -44,11 +40,7 @@ public class MainActivity extends AppCompatActivity implements CardAdapter.ListI
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setCardAdapter();
-
-        SharedPreferences sharedPreferences = getSharedPreferences(getResources().getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(getResources().getString(R.string.preference_recipe_id), -1);
-        editor.apply();
+        setSharedPreference();
         sendBroadcast();
     }
 
@@ -130,6 +122,15 @@ public class MainActivity extends AppCompatActivity implements CardAdapter.ListI
         return super.onOptionsItemSelected(item);
     }
 
+    // shared preference so the widget knows which recipe to display
+    public void setSharedPreference(){
+        SharedPreferences sharedPreferences = getSharedPreferences(getResources().getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(getResources().getString(R.string.preference_recipe_id), -1);
+        editor.apply();
+    }
+
+    // send an intent to update the widget
     public void sendBroadcast(){
         Intent intent = new Intent(this, ListIngredientsWidgetProvider.class);
         intent.setAction(ListIngredientsWidgetProvider.WIDGET_UPDATE);

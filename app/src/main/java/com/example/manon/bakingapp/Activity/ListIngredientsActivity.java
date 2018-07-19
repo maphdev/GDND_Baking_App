@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.manon.bakingapp.Fragment.ListIngredientsFragment;
-import com.example.manon.bakingapp.Fragment.RecipeDetailsFragment;
 import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
 

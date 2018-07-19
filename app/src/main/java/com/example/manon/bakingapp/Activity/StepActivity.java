@@ -4,11 +4,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.example.manon.bakingapp.Fragment.ListIngredientsFragment;
 import com.example.manon.bakingapp.Fragment.StepDetailsFragment;
 import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
-import com.google.android.exoplayer2.SimpleExoPlayer;
 
 public class StepActivity extends AppCompatActivity implements StepDetailsFragment.ChangeFragment{
 
@@ -24,7 +22,7 @@ public class StepActivity extends AppCompatActivity implements StepDetailsFragme
             Recipe recipe = getIntent().getParcelableExtra(getResources().getString(R.string.PARCELABLE_RECIPE));
             setTitle(recipe.getName());
 
-            int id = getIntent().getIntExtra("ID", 0);
+            int id = getIntent().getIntExtra(getString(R.string.ID), 0);
 
             fragmentManager.beginTransaction()
                     .add(R.id.activity_step_container, StepDetailsFragment.newInstance(recipe, id, true))

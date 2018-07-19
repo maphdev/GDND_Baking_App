@@ -3,7 +3,6 @@ package com.example.manon.bakingapp.Widget;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -11,8 +10,6 @@ import com.example.manon.bakingapp.Models.Ingredient;
 import com.example.manon.bakingapp.Models.Recipe;
 import com.example.manon.bakingapp.R;
 import com.example.manon.bakingapp.Utils.NetworkUtils;
-
-import java.util.List;
 
 public class GridWidgetService extends RemoteViewsService{
 
@@ -88,7 +85,7 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getResources().getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         int id = sharedPreferences.getInt(context.getResources().getString(R.string.preference_recipe_id), 0);
 
-        if (id == -1){
+        if (!NetworkUtils.isNetworkAvailable(context) || id == -1 ){
             recipe = null;
         } else {
             recipe = NetworkUtils.getListRecipesFromURL().get(id-1);
