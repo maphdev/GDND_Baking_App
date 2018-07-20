@@ -1,10 +1,12 @@
 package com.example.manon.bakingapp.Fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -76,19 +78,12 @@ public class StepDetailsFragment extends Fragment {
 
         ButterKnife.bind(this, rootView);
 
+        setRetainInstance(true);
+
         recipe = getArguments().getParcelable("RECIPE");
         id = getArguments().getInt("ID");
         step = recipe.getSteps().get(id);
         navigationButtons = getArguments().getBoolean("NAVIGATION_BUTTONS");
-
-        if (savedInstanceState != null){
-            if (savedInstanceState.containsKey("POSITION_EXOPLAYER")){
-                positionExoPlayer = savedInstanceState.getLong("POSITION_EXOPLAYER");
-            }
-            if (savedInstanceState.containsKey("PLAYWHENREADY")){
-                playWhenReady = savedInstanceState.getBoolean("PLAYWHENREADY");
-            }
-        }
 
         populateViews(step);
 
@@ -152,11 +147,11 @@ public class StepDetailsFragment extends Fragment {
             MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(step.getVideoURL()), new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             exoPlayer.prepare(mediaSource);
 
-            Log.v("position", "init : " + Long.toString(exoPlayer.getCurrentPosition()));
             // lecture parameters
             exoPlayer.setPlayWhenReady(playWhenReady);
             exoPlayer.seekTo(positionExoPlayer);
         }
+
         String urlThumbnailString = step.getThumbnailURL();
         if(!urlThumbnailString.equals("") & NetworkUtils.isNetworkAvailable(getContext())){
             if (NetworkUtils.isAnImage(urlThumbnailString)){
@@ -168,6 +163,8 @@ public class StepDetailsFragment extends Fragment {
     // release exoplayer
     public void releasePlayer(){
         if (exoPlayer != null) {
+            positionExoPlayer = exoPlayer.getCurrentPosition();
+            playWhenReady = exoPlayer.getPlayWhenReady();
             exoPlayer.stop();
             exoPlayer.release();
             exoPlayer = null;
@@ -193,10 +190,6 @@ public class StepDetailsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (exoPlayer != null) {
-            positionExoPlayer = exoPlayer.getCurrentPosition();
-            playWhenReady = exoPlayer.getPlayWhenReady();
-        }
         if (Util.SDK_INT <= 23){
             releasePlayer();
         }
@@ -207,6 +200,22 @@ public class StepDetailsFragment extends Fragment {
         super.onStop();
         if(Util.SDK_INT > 23){
             releasePlayer();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            SimpleExoPlayerView.LayoutParams params = (SimpleExoPlayerView.LayoutParams) playerView.getLayoutParams();
+            params.width = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
+            params.height = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
+            playerView.setLayoutParams(params);
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            SimpleExoPlayerView.LayoutParams params = (SimpleExoPlayerView.LayoutParams) playerView.getLayoutParams();
+            params.width = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
+            params.height = 300;
+            playerView.setLayoutParams(params);
         }
     }
 
@@ -226,15 +235,6 @@ public class StepDetailsFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement ChangeFragment");
 
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (exoPlayer != null){
-            outState.putLong("POSITION_EXOPLAYER", positionExoPlayer);
-            outState.putBoolean("PLAYWHENREADY", playWhenReady);
         }
     }
 }

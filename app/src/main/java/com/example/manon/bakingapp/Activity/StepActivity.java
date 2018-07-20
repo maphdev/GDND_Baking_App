@@ -28,6 +28,7 @@ public class StepActivity extends AppCompatActivity implements StepDetailsFragme
                     .add(R.id.activity_step_container, StepDetailsFragment.newInstance(recipe, id, true))
                     .commit();
         }
+
     }
 
     @Override
