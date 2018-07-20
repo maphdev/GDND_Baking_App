@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ public class StepDetailsFragment extends Fragment {
     private int id;
     private boolean navigationButtons = true;
     private long positionExoPlayer = 0;
+    private boolean playWhenReady = true;
 
     // Required empty public constructor
     public StepDetailsFragment() {}
@@ -83,6 +85,9 @@ public class StepDetailsFragment extends Fragment {
             if (savedInstanceState.containsKey("POSITION_EXOPLAYER")){
                 positionExoPlayer = savedInstanceState.getLong("POSITION_EXOPLAYER");
             }
+            if (savedInstanceState.containsKey("PLAYWHENREADY")){
+                playWhenReady = savedInstanceState.getBoolean("PLAYWHENREADY");
+            }
         }
 
         populateViews(step);
@@ -91,54 +96,16 @@ public class StepDetailsFragment extends Fragment {
     }
 
     public void populateViews(Step step){
-        //exoplayer's video
-        String urlVideoString = step.getVideoURL();
-        if (urlVideoString.equals("") || !NetworkUtils.isNetworkAvailable(getContext())){
-            playerView.setVisibility(View.GONE);
-        } else {
-            playerView.setVisibility(View.VISIBLE);
-            URL url = NetworkUtils.getURLfromUri(Uri.parse(step.getVideoURL()));
-            initializePlayer(Uri.parse(urlVideoString));
-        }
-        // exoplayer's thumbnail
-        String urlThumbnailString = step.getThumbnailURL();
-        if(!urlThumbnailString.equals("") & NetworkUtils.isNetworkAvailable(getContext())){
-            if (NetworkUtils.isAnImage(urlThumbnailString)){
-                playerView.setDefaultArtwork(NetworkUtils.getBitmapFromURL(step.getThumbnailURL()));
-            }
-        }
-        // txtViews
         titleTxtView.setText(step.getShortDescription());
         instructionTxtView.setText(step.getDescription());
 
+        if (step.getVideoURL().equals("") || !NetworkUtils.isNetworkAvailable(getContext())){
+            playerView.setVisibility(View.GONE);
+        } else {
+            playerView.setVisibility(View.VISIBLE);
+        }
+
         setButtons();
-    }
-
-    // initialize exoplayer
-    private void initializePlayer(Uri uri){
-        if (exoPlayer == null){
-            // create instance of ExoPlayer
-            TrackSelector trackSelector = new DefaultTrackSelector();
-            LoadControl loadControl = new DefaultLoadControl();
-            exoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
-            playerView.setPlayer(exoPlayer);
-
-            // Prepare the media source
-            String userAgent = Util.getUserAgent(getContext(), getResources().getString(R.string.name_exoplayer));
-            MediaSource mediaSource = new ExtractorMediaSource(uri, new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
-            exoPlayer.prepare(mediaSource);
-            exoPlayer.seekTo(positionExoPlayer);
-            exoPlayer.setPlayWhenReady(true);
-        }
-    }
-
-    // release exoplayer
-    public void releasePlayer(){
-        if (exoPlayer != null) {
-            exoPlayer.stop();
-            exoPlayer.release();
-            exoPlayer = null;
-        }
     }
 
     // set and display the buttons
@@ -170,6 +137,79 @@ public class StepDetailsFragment extends Fragment {
         });
     }
 
+    // initialize Player
+    private void initializePlayer(Step step){
+        String videoUrl = step.getVideoURL();
+        if (!videoUrl.equals("") & NetworkUtils.isNetworkAvailable(getContext())){
+            // create instance of ExoPlayer
+            TrackSelector trackSelector = new DefaultTrackSelector();
+            LoadControl loadControl = new DefaultLoadControl();
+            exoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
+            playerView.setPlayer(exoPlayer);
+
+            // Prepare the media source
+            String userAgent = Util.getUserAgent(getContext(), getResources().getString(R.string.name_exoplayer));
+            MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(step.getVideoURL()), new DefaultDataSourceFactory(getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            exoPlayer.prepare(mediaSource);
+
+            Log.v("position", "init : " + Long.toString(exoPlayer.getCurrentPosition()));
+            // lecture parameters
+            exoPlayer.setPlayWhenReady(playWhenReady);
+            exoPlayer.seekTo(positionExoPlayer);
+        }
+        String urlThumbnailString = step.getThumbnailURL();
+        if(!urlThumbnailString.equals("") & NetworkUtils.isNetworkAvailable(getContext())){
+            if (NetworkUtils.isAnImage(urlThumbnailString)){
+                playerView.setDefaultArtwork(NetworkUtils.getBitmapFromURL(step.getThumbnailURL()));
+            }
+        }
+    }
+
+    // release exoplayer
+    public void releasePlayer(){
+        if (exoPlayer != null) {
+            exoPlayer.stop();
+            exoPlayer.release();
+            exoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT > 23){
+            initializePlayer(step);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Util.SDK_INT <= 23 || exoPlayer == null){
+            initializePlayer(step);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (exoPlayer != null) {
+            positionExoPlayer = exoPlayer.getCurrentPosition();
+            playWhenReady = exoPlayer.getPlayWhenReady();
+        }
+        if (Util.SDK_INT <= 23){
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(Util.SDK_INT > 23){
+            releasePlayer();
+        }
+    }
+
     // change fragments with button's action, implemented by activity
     ChangeFragment changeFragment;
 
@@ -189,36 +229,12 @@ public class StepDetailsFragment extends Fragment {
         }
     }
 
-    // when a phone is a landscape mode, the exoplayer is in full screen
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            SimpleExoPlayerView.LayoutParams params = (SimpleExoPlayerView.LayoutParams) playerView.getLayoutParams();
-            params.width = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
-            params.height = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
-            playerView.setLayoutParams(params);
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
-            SimpleExoPlayerView.LayoutParams params = (SimpleExoPlayerView.LayoutParams) playerView.getLayoutParams();
-            params.width = SimpleExoPlayerView.LayoutParams.MATCH_PARENT;
-            params.height = 300;
-            playerView.setLayoutParams(params);
-        }
-    }
-
-    // what happens when the activity is destroyed?
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (exoPlayer != null)
-            releasePlayer();
-    }
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (exoPlayer != null){
-            outState.putLong("POSITION_EXOPLAYER", exoPlayer.getCurrentPosition());
+            outState.putLong("POSITION_EXOPLAYER", positionExoPlayer);
+            outState.putBoolean("PLAYWHENREADY", playWhenReady);
         }
     }
 }
