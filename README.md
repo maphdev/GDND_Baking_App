@@ -6,6 +6,8 @@ Baking App is an app that allows Udacity’s resident baker-in-chief, Miriam, to
 
 ## Preview
 
+Phone layout:
+
 ![gif preview](https://github.com/maphdev/GDND_Baking_App/blob/master/preview.gif)
 
 Tablet layout:
